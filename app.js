@@ -18,7 +18,7 @@ const connectDb = async () => {
 const productSchema = new mongoose.Schema({
     title: {
         type: String,
-        required:true
+        required: true
     },
     price: Number,
     description: String,
@@ -40,6 +40,7 @@ app.get("/", (req, res) => {
     })
 })
 
+// create operation 
 app.post("/products", async (req, res) => {
     try {
         const { title, price, description } = req.body;
@@ -48,23 +49,41 @@ app.post("/products", async (req, res) => {
             price,
             description
         })
-        const productData = await Product.insertMany([
-            {
-                title: "samsung galaxy a5",
-                price: 12000,
-                description: "a good phone"
-            },
-            {
-                title: "samsung galaxy a7",
-                price: 13500,
-                description: "a good phone"
-            }
-        ]);
+
+        await newProduct.save();
+        // const productData = await Product.insertMany([
+        //     {
+        //         title: "samsung galaxy a5",
+        //         price: 12000,
+        //         description: "a good phone"
+        //     },
+        //     {
+        //         title: "samsung galaxy a7",
+        //         price: 13500,
+        //         description: "a good phone"
+        //     }
+        // ]);
         res.status(201).json({
             message: "Product added successfully"
         })
     } catch (error) {
         console.log(error.message);
+        res.status(500).send(error.message)
+    }
+})
+
+app.get("/products", async (req, res) => {
+    try {
+        const products = await Product.find();
+        if (products){
+            res.status(200).send(products)
+        }
+        else {
+            res.status(404).send({
+                message: "no products found"
+            })
+        }
+    } catch (error) {
         res.status(500).send(error.message)
     }
 })
