@@ -16,7 +16,10 @@ const connectDb = async () => {
 
 // create schema 
 const productSchema = new mongoose.Schema({
-    title: String,
+    title: {
+        type: String,
+        required:true
+    },
     price: Number,
     description: String,
     createdAt: {
@@ -45,7 +48,18 @@ app.post("/products", async (req, res) => {
             price,
             description
         })
-        newProduct.save();
+        const productData = await Product.insertMany([
+            {
+                title: "samsung galaxy a5",
+                price: 12000,
+                description: "a good phone"
+            },
+            {
+                title: "samsung galaxy a7",
+                price: 13500,
+                description: "a good phone"
+            }
+        ]);
         res.status(201).json({
             message: "Product added successfully"
         })
