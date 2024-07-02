@@ -76,10 +76,15 @@ app.get("/products", async (req, res) => {
     try {
         const products = await Product.find();
         if (products){
-            res.status(200).send(products)
+            res.status(200).send({
+                success: true,
+                message: "Return Products",
+                data: products
+            })
         }
         else {
             res.status(404).send({
+                success: false,
                 message: "no products found"
             })
         }
@@ -93,11 +98,16 @@ app.get("/products/:id", async (req, res) => {
         const id = req.params.id;
         const product = await Product.findOne({_id: id});
         if (product){
-            res.status(200).send(product)
+            res.status(200).send({
+                success: true,
+                message: "Return single product",
+                data: product
+            })
         }
         else {
             res.status(404).send({
-                message: "no products found"
+                success: false,
+                message: "no product found"
             })
         }
     } catch (error) {
