@@ -88,4 +88,21 @@ app.get("/products", async (req, res) => {
     }
 })
 
+app.get("/products/:id", async (req, res) => {
+    try {
+        const id = req.params.id;
+        const product = await Product.findOne({_id: id});
+        if (product){
+            res.status(200).send(product)
+        }
+        else {
+            res.status(404).send({
+                message: "no products found"
+            })
+        }
+    } catch (error) {
+        res.status(500).send(error.message)
+    }
+})
+
 module.exports = { app, connectDb };
