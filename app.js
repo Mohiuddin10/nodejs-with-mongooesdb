@@ -20,8 +20,18 @@ const productSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    price: Number,
-    description: String,
+    price: {
+        type: Number,
+        required: true
+    },
+    description: {
+        type: String,
+        required: true
+    },
+    rating: {
+        type: Number,
+        required: true
+    },
     createdAt: {
         type: Date,
         default: Date.now
@@ -43,11 +53,12 @@ app.get("/", (req, res) => {
 // create operation 
 app.post("/products", async (req, res) => {
     try {
-        const { title, price, description } = req.body;
+        const { title, price, description, rating } = req.body;
         const newProduct = new Product({
             title,
             price,
-            description
+            description,
+            rating
         })
 
         await newProduct.save();
@@ -72,10 +83,42 @@ app.post("/products", async (req, res) => {
     }
 })
 
+// find with logical operator 
+app.get("/products2", async (req, res) => {
+    try {
+        const price = req.query.price;
+        const rating = req.query.rating;
+        console.log(price, rating);
+        let products;
+        if (price && rating) {
+            products = await Product.find({ $and: [{ price: { $lt: price } }, { rating: { $gt: rating } }] });
+        } else {
+            products = await Product.find();
+        }
+
+
+        if (products) {
+            res.status(200).send({
+                success: true,
+                message: "Return Products",
+                data: products
+            })
+        }
+        else {
+            res.status(404).send({
+                success: false,
+                message: "no products found"
+            })
+        }
+    } catch (error) {
+        res.status(500).send(error.message)
+    }
+})
+
 app.get("/products", async (req, res) => {
     try {
         const products = await Product.find();
-        if (products){
+        if (products) {
             res.status(200).send({
                 success: true,
                 message: "Return Products",
@@ -96,8 +139,8 @@ app.get("/products", async (req, res) => {
 app.get("/products/:id", async (req, res) => {
     try {
         const id = req.params.id;
-        const product = await Product.findOne({_id: id});
-        if (product){
+        const product = await Product.findOne({ _id: id });
+        if (product) {
             res.status(200).send({
                 success: true,
                 message: "Return single product",
