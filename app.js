@@ -117,7 +117,7 @@ app.get("/products2", async (req, res) => {
 
 app.get("/products", async (req, res) => {
     try {
-        const products = await Product.find();
+        const products = await Product.find().sort({ price: 1 });
         if (products) {
             res.status(200).send({
                 success: true,
@@ -155,6 +155,32 @@ app.get("/products/:id", async (req, res) => {
         }
     } catch (error) {
         res.status(500).send(error.message)
+    }
+})
+
+// delete product 
+app.delete("/products/:id", async (req, res) => {
+    try {
+        const id = req.params.id;
+        const product = await Product.deleteOne({ _id: id });
+        if (product) {
+            res.status(200).send({
+                success: true,
+                message: "Product Deleted successfully",
+                data: product
+            })
+        } else {
+            res.status(404).send({
+                success: false,
+                message: "Product not found",
+                data: product
+            })
+        }
+    } catch (error) {
+        res.status(500).send({
+            success: false,
+            message: "server error"
+        })
     }
 })
 
